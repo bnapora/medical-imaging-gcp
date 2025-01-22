@@ -28,12 +28,18 @@ export const environment: EnvironmentSettings = {
   // https://portal.imaging.datacommons.cancer.gov/explore/filters/?Modality_op=OR&Modality=SM
   // For example: MSB-07656
   'IMAGE_DICOM_STORE_BASE_URL':
-      'https://proxy.imaging.datacommons.cancer.gov/bulk/current/viewer-only-no-downloads-see-tinyurl-dot-com-slash-3j3d9jyp/dicomWeb',
-  'OAUTH_CLIENT_ID': '',
+        // 'https://poc1.gestaltcloud.com/tile/projects/gcp-pathology-poc1/locations/us-west2/datasets/dicom-pathology/dicomStores/slide-dicom-store/dicomWeb',
+        'https://dicom.poc1.gestaltcloud.com/dicom-public01/projects/gcp-pathology-poc1/locations/us-west2/datasets/dicom-pathology/dicomStores/slide-dicom-store-public/dicomWeb',
+        // 'https://dicom.poc1.gestaltcloud.com/dicom-public01/projects/gcp-pathology-poc1/locations/us-west2/datasets/dicom-pathology/dicomStores/viewer-public-test01/dicomWeb',
+        // 'https://proxy.imaging.datacommons.cancer.gov/bulk/current/viewer-only-no-downloads-see-tinyurl-dot-com-slash-3j3d9jyp/dicomWeb',
+  'OAUTH_CLIENT_ID': '1053568465268-t2coh1p3ke4lrhu6o042squicec9toed.apps.googleusercontent.com',
   'APP_BASE_SERVER_PATH': '',
   'USE_HASH_LOCATION_STRATEGY': false,
   //// (optional) Annotations.
-  'ANNOTATIONS_DICOM_STORE_BASE_URL': '',
+  'ANNOTATIONS_DICOM_STORE_BASE_URL': 
+        // 'https://poc1.gestaltcloud.com/tile/projects/gcp-pathology-poc1/locations/us-west2/datasets/dicom-pathology/dicomStores/slide-dicom-store/dicomWeb',
+        'https://dicom.poc1.gestaltcloud.com/dicom-public01/projects/gcp-pathology-poc1/locations/us-west2/datasets/dicom-pathology/dicomStores/slide-dicom-store-public/dicomWeb',
+        // 'https://dicom.poc1.gestaltcloud.com/dicom-public01/projects/gcp-pathology-poc1/locations/us-west2/datasets/dicom-pathology/dicomStores/viewer-public-test01/dicomWeb',
   'ENABLE_ANNOTATIONS': true,
   'ENABLE_ANNOTATION_WRITING': true,
   'ANNOTATION_HASH_STORED_USER_EMAIL': false,
