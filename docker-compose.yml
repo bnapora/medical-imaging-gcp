@@ -1,0 +1,18 @@
+version: '3.7'
+name: medicalimaging-gcp
+
+services:
+  dicom-proxy-gcp:
+    build: 
+        dockerfile: ./pathology/dicom_proxy/Dockerfile
+        args:
+          BASE_CONTAINER: base_py_opencv_docker:latest
+    container_name: dicom-proxy-gcp
+    restart: unless-stopped
+    networks:
+      - medicalimaging-gcp-net
+
+networks:
+  medicalimaging-gcp-net:
+    name: medicalimaging-gcp-net
+    
