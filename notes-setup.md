@@ -35,7 +35,7 @@ gcloud run deploy dicom-proxy-gcp-private01 \
 --set-env-vars "CLOUD_OPS_LOG_NAME=dicom-proxy-gcp-private" \
 --service-account=dicom-web-proxy-public@gcp-pathology-poc1.iam.gserviceaccount.com
 
-## Setup IAP for DICOM Proxy
+## Setup IAP for DICOM Proxy (021025)
 Enable IAP for each service (using `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET`
 from [Step 2.1](#step2.1))
 
@@ -50,3 +50,18 @@ gcloud iap web enable --resource-type=backend-services \
 --oauth2-client-id=1053568465268-t2coh1p3ke4lrhu6o042squicec9toed.apps.googleusercontent.com \
 --oauth2-client-secret=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 \
 --service=${DICOM_PROXY_SERVICE_ID?}
+
+## Notes on Deployment without IAP (02/13/2025)
+**Background:** have not been able to get a GCP DICOM_PROXY to work with IAP when hosted in Cloud Run.  Believe it is something to do with how Cloud Run handles HTTP requests before passing them into the container. (https://cloud.google.com/iap/docs/enabling-cloud-run)
+
+**New Configuration:** 
+- Disable IAP for Load Balancer Backend routing traffic to Cloud Run Container
+  - Rely on user authentication against the ACL of the specific DICOM Store.
+- Disable IAP on DICOM_PROXY env config
+- Disable "Use_IAP" flag in Viewr-OHIF and Viewer-Clinical config file
+  - Causes viewer to use standard OAuth BEARER token instead of JWT
+- Point Viewer config at DICOM_PROXY w/o IAP
+
+**Issues:**  
+- DICOM_PROXY takes 7 - 10 minutes to respond to connections when first started
+- Confirm Access Control List is providing expected protection.
