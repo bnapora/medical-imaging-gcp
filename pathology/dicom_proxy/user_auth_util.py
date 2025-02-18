@@ -172,15 +172,18 @@ class AuthSession:
   def _init_to_service_account_credentials(self) -> None:
     """Initializes service account default credentials."""
     cloud_logging_client.info('Retrieving service account credentials.')
-    credentials, _ = google.auth.default()
+    credentials, _ = google.auth.default(scopes = ['https://www.googleapis.com/auth/cloud-healthcare'])
     # Credentials need to be refreshed to return a bearer token.
     credentials.refresh(google.auth.transport.requests.Request())
     bearer_token = f'Bearer {credentials.token}'
     self._auth_dict[proxy_const.HeaderKeywords.AUTH_HEADER_KEY] = bearer_token
     self._auth_dict[proxy_const.HeaderKeywords.AUTHORITY_HEADER_KEY] = ''
-    self._userid_dict[_EMAIL_DERIVED_FROM_BEARER_TOKEN] = (
-        _get_email_from_bearer_token(bearer_token)
-    )
+    try:
+      self._userid_dict[_EMAIL_DERIVED_FROM_BEARER_TOKEN] = (
+          _get_email_from_bearer_token(bearer_token)
+      )
+    except UserEmailRetrievalError as exc:
+      self._userid_dict[_EMAIL_DERIVED_FROM_BEARER_TOKEN] = credentials.service_account_email
 
   @property
   def email(self) -> str:

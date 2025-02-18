@@ -1,21 +1,60 @@
 # PathCloud Setup Notes for Medical-Imaging-GCP
-Build base image dockerfile: 
+
+Build base image dockerfile:
 `pathology/base_docker_images/base_py_debian_docker/Dockerfile`
 Base Image Name: medicalimaging-gcp-base-py-debian:latest
+
 - can't use hyphens to refer to a base image
-docker tag 8fc53e693cbf base_py_debian_docker
+  docker tag 8fc53e693cbf base_py_debian_docker
 
 ### Build base image py_opencv
-docker buildx build --build-arg BASE_CONTAINER=base_py_debian_docker:latest -t base_py_opencv_docker .
 
+```sh
+docker buildx build --build-arg BASE_CONTAINER=base_py_debian_docker:latest -t base_py_opencv_docker .
 docker tag 0870763d5c0b us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/base_py_opencv_docker
+```
+
+or download and tag it:
+
+```sh
+docker pull us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/base_py_opencv_docker:latest
+docker tag us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/base_py_opencv_docker:latest base_py_opencv_docker
+```
 
 ### Build dicom-proxy container
-docker buildx build --build-arg BASE_CONTAINER=base_py_opencv_docker:latest -t us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp ./pathology/dicom_proxy/Dockerfile
 
+```sh
+docker buildx build --build-arg BASE_CONTAINER=base_py_opencv_docker:latest -t us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp -f ./pathology/dicom_proxy/Dockerfile .
+```
+
+````sh
+docker run -d --name dicom-proxy-gcp \
+  -p 8080:8080 \
+  -e ORIGINS=\* \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/credentials/gcp-pathology-poc1_service_key.json \
+  -e VALIDATE_IAP=false \
+  -e JWT_AUDIENCE=/projects/1053568465268/global/backendServices/1470682154844812331 \
+  -e URL_PATH_PREFIX=/dicom_proxy \
+  -e API_PORT_FLG=8080 \
+  -e DEFAULT_DICOM_STORE_API_VERSION=v1beta1 \
+  -e ENABLE_APPLICATION_DEFAULT_CREDENTIALS=false \
+  -e ENABLE_DEBUG_FUNCTION_TIMING=false \
+  -e REDIS_CACHE_HOST_IP=localhost \
+  -e REDIS_CACHE_HOST_PORT=6379 \
+  -e GUNICORN_BIND=0.0.0.0:8080 \
+  -v $(pwd)/gcp-pathology-poc1_service_key.json:/credentials/gcp-pathology-poc1_service_key.json \
+  us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp
+
+# To see the log output at the console, use the following command:
+docker logs -f dicom-proxy-gcp
+
+```sh
+gcloud auth login
 docker push us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp
+````
 
 ### Deploy Container to Cloud Run
+
 gcloud run deploy dicom-proxy-gcp-private01 \
 --image us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp:latest \
 --region=us-west2 --project=gcp-pathology-poc1 \
@@ -23,7 +62,7 @@ gcloud run deploy dicom-proxy-gcp-private01 \
 --memory 16G --cpu 4 --execution-environment=gen2 \
 --cpu-boost \
 --min-instances=1 --max-instances=100 --timeout=300 --concurrency=40 \
---set-env-vars "ORIGINS=*" \
+--set-env-vars "ORIGINS=\*" \
 --set-env-vars "VALIDATE_IAP=true" \
 --set-env-vars "JWT_AUDIENCE=/projects/1053568465268/global/backendServices/1470682154844812331" \
 --set-env-vars "URL_PATH_PREFIX=/private01" \
@@ -35,7 +74,8 @@ gcloud run deploy dicom-proxy-gcp-private01 \
 --set-env-vars "CLOUD_OPS_LOG_NAME=dicom-proxy-gcp-private" \
 --service-account=dicom-web-proxy-public@gcp-pathology-poc1.iam.gserviceaccount.com
 
-## Setup IAP for DICOM Proxy (021025)
+## Setup IAP for DICOM Proxy
+
 Enable IAP for each service (using `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET`
 from [Step 2.1](#step2.1))
 
@@ -52,9 +92,11 @@ gcloud iap web enable --resource-type=backend-services \
 --service=${DICOM_PROXY_SERVICE_ID?}
 
 ## Notes on Deployment without IAP (02/13/2025)
-**Background:** have not been able to get a GCP DICOM_PROXY to work with IAP when hosted in Cloud Run.  Believe it is something to do with how Cloud Run handles HTTP requests before passing them into the container. (https://cloud.google.com/iap/docs/enabling-cloud-run)
 
-**New Configuration:** 
+**Background:** have not been able to get a GCP DICOM_PROXY to work with IAP when hosted in Cloud Run. Believe it is something to do with how Cloud Run handles HTTP requests before passing them into the container. (https://cloud.google.com/iap/docs/enabling-cloud-run)
+
+**New Configuration:**
+
 - Disable IAP for Load Balancer Backend routing traffic to Cloud Run Container
   - Rely on user authentication against the ACL of the specific DICOM Store.
 - Disable IAP on DICOM_PROXY env config
@@ -62,6 +104,7 @@ gcloud iap web enable --resource-type=backend-services \
   - Causes viewer to use standard OAuth BEARER token instead of JWT
 - Point Viewer config at DICOM_PROXY w/o IAP
 
-**Issues:**  
+**Issues:**
+
 - DICOM_PROXY takes 7 - 10 minutes to respond to connections when first started
 - Confirm Access Control List is providing expected protection.

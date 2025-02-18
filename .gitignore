@@ -39,3 +39,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+gcp-pathology-poc1_service_key.json
+
+*.pyc
