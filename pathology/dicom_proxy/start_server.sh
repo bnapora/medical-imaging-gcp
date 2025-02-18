@@ -13,5 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-/usr/sbin/nginx -c /nginx.conf -e stderr
+# /usr/sbin/nginx -c /nginx.conf -e stderr
 python3 -OO /pathology/dicom_proxy/server.pyc

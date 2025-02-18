@@ -45,6 +45,14 @@ GUNICORN_THREADS_FLG = flags.DEFINE_integer(
     'Number of threads each GUnicorn processes should launch',
 )
 
+GUNICORN_BIND_FLG = flags.DEFINE_string(
+    'gunicorn_bind',
+    secret_flag_utils.get_secret_or_env(
+        'GUNICORN_BIND', 'unix:/tmp/gunicorn.sock'
+    ),  # Default host:port for local DPAS web host.
+    'Sites to allow requests from for CORS.',
+)
+
 API_PORT_FLG = flags.DEFINE_integer('port', 8080, 'port to listen on')
 
 ORIGINS_FLG = flags.DEFINE_multi_string(
