@@ -102,6 +102,13 @@ ENABLE_APPLICATION_DEFAULT_CREDENTIALS_FLG = flags.DEFINE_boolean(
 
 VALIDATE_IAP_FLG = auth.VALIDATE_IAP_FLG
 
+ENABLE_FAKE_EMAIL_FLG = flags.DEFINE_boolean(
+    'enable_fake_email',
+    secret_flag_utils.get_bool_secret_or_env('ENABLE_FAKE_EMAIL', False),
+    'Enable the use of a fake email adresse if a service account calls the Proxy. It is not possible to get the email adresse of a service account.',
+)
+
+
 # ICC Profile Color Conversion.
 
 THIRD_PARTY_ICC_PROFILE_DICRECTORY_FLG = flags.DEFINE_string(
