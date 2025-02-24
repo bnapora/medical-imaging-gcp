@@ -42,6 +42,7 @@ docker run -d --name dicom-proxy-gcp \
   -e REDIS_CACHE_HOST_IP=localhost \
   -e REDIS_CACHE_HOST_PORT=6379 \
   -e GUNICORN_BIND=0.0.0.0:8080 \
+  -e ENABLE_FAKE_EMAIL=true \
   -v $(pwd)/gcp-pathology-poc1_service_key.json:/credentials/gcp-pathology-poc1_service_key.json \
   us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp
 
@@ -69,6 +70,7 @@ gcloud run deploy dicom-proxy-gcp-private01 \
 --set-env-vars "URL_PATH_PREFIX=/private01" \
 --set-env-vars "API_PORT_FLG=8080" \
 --set-env-vars "GUNICORN_BIND=0.0.0.0:8080" \
+--set-env-vars "ENABLE_FAKE_EMAIL=true" \
 --set-env-vars "DEFAULT_DICOM_STORE_API_VERSION=v1beta1" \
 --set-env-vars "ENABLE_APPLICATION_DEFAULT_CREDENTIALS=true" \
 --set-env-vars "ENABLE_DEBUG_FUNCTION_TIMING=true" \

@@ -42,6 +42,7 @@
 
                 "GUNICORN_WORKERS": "1",
                 "GUNICORN_BIND": "127.0.0.1:8080",
+                "ENABLE_FAKE_EMAIL": "true",
             },
             "args": [
                 "run",
