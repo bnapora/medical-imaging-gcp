@@ -64,7 +64,7 @@ gcloud run deploy dicom-proxy-gcp-private01 \
 --memory 16G --cpu 4 --execution-environment=gen2 \
 --cpu-boost \
 --min-instances=1 --max-instances=100 --timeout=300 --concurrency=40 \
---set-env-vars "ORIGINS=\*" \
+--set-env-vars "ORIGINS=*" \
 --set-env-vars "VALIDATE_IAP=false" \
 --set-env-vars "JWT_AUDIENCE=/projects/1053568465268/global/backendServices/1470682154844812331" \
 --set-env-vars "URL_PATH_PREFIX=/private01" \
