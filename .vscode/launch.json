@@ -30,7 +30,7 @@
                 "JWT_AUDIENCE": "/projects/1053568465268/global/backendServices/1470682154844812331",
                 "URL_PATH_PREFIX": "/dicom_proxy",
                 "API_PORT_FLG": "8080",
-                "ENABLE_APPLICATION_DEFAULT_CREDENTIALS": "false", // Will use the service account credentials
+                "ENABLE_APPLICATION_DEFAULT_CREDENTIALS": "true", // Will use the service account credentials
                 "ENABLE_DEBUG_FUNCTION_TIMING": "false",
                 "REDIS_CACHE_HOST_IP": "localhost",
                 "REDIS_CACHE_HOST_PORT": "6379",

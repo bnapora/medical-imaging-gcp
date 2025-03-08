@@ -30,7 +30,7 @@ docker buildx build --build-arg BASE_CONTAINER=base_py_opencv_docker:latest -t u
 ````sh
 docker run -d --name dicom-proxy-gcp \
   -p 8080:8080 \
-  -e ORIGINS=\* \
+  -e ORIGINS=* \
   -e GOOGLE_APPLICATION_CREDENTIALS=/credentials/gcp-pathology-poc1_service_key.json \
   -e VALIDATE_IAP=false \
   -e JWT_AUDIENCE=/projects/1053568465268/global/backendServices/1470682154844812331 \
