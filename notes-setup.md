@@ -80,6 +80,33 @@ gcloud run deploy dicom-proxy-gcp-private01 \
 --service-account=dicom-web-proxy-public@gcp-pathology-poc1.iam.gserviceaccount.com
 ```
 
+### Deploy Container to Cloud Run (STAGE01) (03/10/25)
+
+```sh
+gcloud config set project pathcloud-stage01 && \
+gcloud run deploy dicom-proxy01 \
+--image us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp:latest \
+--region=us-west2 --project=pathcloud-stage01 \
+--port=8080 --allow-unauthenticated \
+--memory 16G --cpu 4 --execution-environment=gen2 \
+--cpu-boost \
+--min-instances=1 --max-instances=100 --timeout=300 --concurrency=40 \
+--set-env-vars "ORIGINS=*" \
+--set-env-vars "VALIDATE_IAP=false" \
+--set-env-vars "JWT_AUDIENCE=/projects/392114647566/global/backendServices/2330763155586546886" \
+--set-env-vars "URL_PATH_PREFIX=/proxy01" \
+--set-env-vars "API_PORT_FLG=8080" \
+--set-env-vars "GUNICORN_BIND=0.0.0.0:8080" \
+--set-env-vars "ENABLE_FAKE_EMAIL=true" \
+--set-env-vars "DEFAULT_DICOM_STORE_API_VERSION=v1beta1" \
+--set-env-vars "ENABLE_APPLICATION_DEFAULT_CREDENTIALS=true" \
+--set-env-vars "ENABLE_DEBUG_FUNCTION_TIMING=true" \
+--set-env-vars "REDIS_CACHE_HOST_IP=10.191.97.11" \
+--set-env-vars "REDIS_CACHE_HOST_PORT=6379" \
+--set-env-vars "CLOUD_OPS_LOG_NAME=dicom-proxy01" \
+--service-account=dicom-web-proxy@pathcloud-stage01.iam.gserviceaccount.com
+```
+
 ## Setup IAP for DICOM Proxy
 
 Enable IAP for each service (using `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET`
