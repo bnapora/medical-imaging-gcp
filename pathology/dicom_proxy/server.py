@@ -139,6 +139,8 @@ class GunicornApplication(BaseApplication):
 
   def load_config(self):
     self.cfg.set('worker_class', 'gthread')
+    self.cfg.set('timeout', 120)
+    
     self.cfg.set('workers', str(dicom_proxy_flags.GUNICORN_WORKERS_FLG.value))
     self.cfg.set('threads', str(dicom_proxy_flags.GUNICORN_THREADS_FLG.value))
     self.cfg.set('bind', str(dicom_proxy_flags.GUNICORN_BIND_FLG.value)) # 'unix:/tmp/gunicorn.sock'

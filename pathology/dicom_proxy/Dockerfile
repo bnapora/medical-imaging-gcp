@@ -22,16 +22,15 @@ WORKDIR /
 # Add additional ICC Profiles to the container here.
 ENV THIRD_PARTY_ICC_PROFILE_DIRECTORY='/icc_profiles'
 # copy adobe rgb icc profile into 3rd party icc profile directory
-RUN apt-get -qq update && apt-get install -y unzip wget && \
-   mkdir /icc_profiles && \
-   wget -q ftp://ftp.adobe.com/pub/adobe/iccprofiles/mac/AdobeICCProfilesCS4Mac_end-user.zip && \
-   unzip -qq AdobeICCProfilesCS4Mac_end-user.zip -d ./adobe_icc_profiles && \
-   rm AdobeICCProfilesCS4Mac_end-user.zip && \
+
+RUN apt-get update && apt-get install -y wget && \
+   # Create the directory for ICC profiles
    mkdir -p /icc_profiles/adobergb && \
-   cp "./adobe_icc_profiles/Adobe ICC Profiles (end-user)/"*.pdf /icc_profiles/adobergb && \
-   cp "./adobe_icc_profiles/Adobe ICC Profiles (end-user)/RGB/AdobeRGB1998.icc" /icc_profiles/adobergb && \
-   rm -r -f ./adobe_icc_profiles && \
-   apt-get -qq purge -y unzip wget
+   # Download the AdobeRGB1998.icc profile
+   wget -O /icc_profiles/adobergb/AdobeRGB1998.icc https://raw.githubusercontent.com/liuziangexit/EmbedICCProfile/master/icc-profile/AdobeRGB1998.icc && \
+   # Clean up
+   apt-get purge -y wget && apt-get autoremove -y
+
 # To add additional ICC Profiles to the container, add place them in the
 # /icc_profiles directory
 # Note: During build the following warning maybe raised:
@@ -97,12 +96,13 @@ RUN apt-get update && \
    find /icc_profiles -type d -exec chmod 755 {} \; && \
    find /icc_profiles -type f -exec chmod 644 {} \; && \
    # Setup nginx
-   #mv /pathology/dicom_proxy/nginx.conf /nginx.conf && \
+   mv /pathology/dicom_proxy/nginx.conf /nginx.conf && \
    # Setup server start script
    chmod 755 /start_server.sh && \
    chmod +x /start_server.sh
 ENV PYTHONPATH="${PYTHONPATH}:/"
 # Run unit tests on container.
+
 RUN set -e && \
    python3 -m unittest discover -p "*_test.py" -s "/pathology/dicom_proxy" -t / && \
    python3 -m unittest discover -p "*_test.py" -s "/pathology/shared_libs" -t / && \

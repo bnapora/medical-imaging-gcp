@@ -12,9 +12,5 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# /usr/sbin/nginx -c /nginx.conf -e stderr
-#python3 -OO /pathology/dicom_proxy/server.pyc
-
-hypercorn /pathology/dicom_proxy/server_hypercorn:asgi_app --bind "${GUNICORN_BIND:-0.0.0.0:8080}" --worker-class asyncio  --workers "${GUNICORN_WORKERS:-4}" --keep-alive "${KEEP_ALIVE:-3600}"
-
+# ==============================================================================
+docker build -t local_transform_pipeline_docker_container .  --build-arg=BASE_CONTAINER=$1

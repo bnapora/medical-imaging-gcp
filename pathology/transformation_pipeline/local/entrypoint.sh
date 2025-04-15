@@ -12,9 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# /usr/sbin/nginx -c /nginx.conf -e stderr
-#python3 -OO /pathology/dicom_proxy/server.pyc
-
-hypercorn /pathology/dicom_proxy/server_hypercorn:asgi_app --bind "${GUNICORN_BIND:-0.0.0.0:8080}" --worker-class asyncio  --workers "${GUNICORN_WORKERS:-4}" --keep-alive "${KEEP_ALIVE:-3600}"
-
+# ==============================================================================
+echo "Local container running."
+USER_ID=${LOCAL_UID:-9001}
+GROUP_ID=${LOCAL_GID:-9001}
+echo "Starting with UID: $USER_ID, GID: $GROUP_ID"
+useradd -u $USER_ID -o -m local_user
+groupmod -g $GROUP_ID local_user
+export CLOUDSDK_CONFIG=/home/local_user/.config/gcloud
+runuser -l local_user -c "gcloud config set disable_file_logging true"
+python3 -OO /pathology/transformation_pipeline/local_main.py
