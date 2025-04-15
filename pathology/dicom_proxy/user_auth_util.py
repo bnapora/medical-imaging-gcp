@@ -184,7 +184,7 @@ class AuthSession:
   def _init_to_service_account_credentials(self) -> None:
     """Initializes service account default credentials."""
     cloud_logging_client.info('Retrieving service account credentials.')
-    credentials, _ = google.auth.default()
+    credentials, _ = google.auth.default(scopes = ['https://www.googleapis.com/auth/cloud-healthcare'])
     # Credentials need to be refreshed to return a bearer token.
     credentials.refresh(google.auth.transport.requests.Request())
     bearer_token = f'Bearer {credentials.token}'

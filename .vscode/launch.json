@@ -50,8 +50,7 @@
                     //"--no-reload"
             ],
             "jinja": true
-        },
-        
+        },        
         {
             "name": "Debugger: Hypercorn",
             "type": "debugpy",

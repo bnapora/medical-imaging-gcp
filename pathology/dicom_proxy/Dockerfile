@@ -22,6 +22,7 @@ WORKDIR /
 # Add additional ICC Profiles to the container here.
 ENV THIRD_PARTY_ICC_PROFILE_DIRECTORY='/icc_profiles'
 # copy adobe rgb icc profile into 3rd party icc profile directory
+
 RUN apt-get update && apt-get install -y wget && \
    # Create the directory for ICC profiles
    mkdir -p /icc_profiles/adobergb && \
@@ -29,6 +30,7 @@ RUN apt-get update && apt-get install -y wget && \
    wget -O /icc_profiles/adobergb/AdobeRGB1998.icc https://raw.githubusercontent.com/liuziangexit/EmbedICCProfile/master/icc-profile/AdobeRGB1998.icc && \
    # Clean up
    apt-get purge -y wget && apt-get autoremove -y
+
 # To add additional ICC Profiles to the container, add place them in the
 # /icc_profiles directory
 # Note: During build the following warning maybe raised:
@@ -100,12 +102,12 @@ RUN apt-get update && \
    chmod +x /start_server.sh
 ENV PYTHONPATH="${PYTHONPATH}:/"
 # Run unit tests on container.
-#  Currently disabled due to issues with running unit tests in docker container and threads vs. processes.
-#RUN set -e && \
-#   python3 -m unittest discover -p "*_test.py" -s "/pathology/dicom_proxy" -t / && \
-#   python3 -m unittest discover -p "*_test.py" -s "/pathology/shared_libs" -t / && \
-#   set +e && \
-#   rm -r /tmp/*
+
+RUN set -e && \
+   python3 -m unittest discover -p "*_test.py" -s "/pathology/dicom_proxy" -t / && \
+   python3 -m unittest discover -p "*_test.py" -s "/pathology/shared_libs" -t / && \
+   set +e && \
+   rm -r /tmp/*
 # Set container to run as non-root user.
 # NonRootUser configured in dpas-debian-python-base image.
 USER NonRootUser

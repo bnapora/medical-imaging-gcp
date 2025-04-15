@@ -17,3 +17,4 @@
 #python3 -OO /pathology/dicom_proxy/server.pyc
 
 hypercorn /pathology/dicom_proxy/server_hypercorn:asgi_app --bind "${GUNICORN_BIND:-0.0.0.0:8080}" --worker-class asyncio  --workers "${GUNICORN_WORKERS:-4}" --keep-alive "${KEEP_ALIVE:-3600}"
+
