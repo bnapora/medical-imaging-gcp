@@ -1151,7 +1151,9 @@ def _studies_search(
   )
   return metadata_augmentation.augment_study_response_metadata(
       dicom_web_base_url,
-      dicom_store_util.dicom_store_proxy(),
+      dicom_store_util.dicom_store_proxy(
+        dicom_web_base_url=dicom_web_base_url
+      ),
   )
 
 
