@@ -158,6 +158,17 @@ def get_bulk_data_base_url(
 ) -> str:
   """Returns base url for bulk data response."""
   base_url = dicom_proxy_flags.BULK_DATA_PROXY_URL_FLG.value
+  replace_base_url = dicom_proxy_flags.BULK_DATA_REPLACE_ROOT_URL_FLG.value
+  if replace_base_url and base_url:
+    match = _GET_TILE_SERVER_PROJECT_REGEX.fullmatch(flask_util.get_base_url())
+    if match is None:
+      return ''
+    tile_location_url = match.groups()[1]
+    return (
+        f'{base_url}{dicom_proxy_flags.PROXY_SERVER_URL_PATH_PREFIX}/'
+        f'{tile_location_url}'
+    )
+
   if base_url:
     return base_url.rstrip('/')
   url_root = _set_bulk_data_uri_protocal(flask_util.get_url_root())

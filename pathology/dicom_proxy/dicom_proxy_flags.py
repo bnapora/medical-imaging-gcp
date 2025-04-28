@@ -562,3 +562,10 @@ ENABLE_ANNOTATION_BULKDATA_METADATA_PATCH = flags.DEFINE_boolean(
     ' returned metadata to fix store bug which results in store not returning'
     ' short binary tags.',
 )
+
+
+BULK_DATA_REPLACE_ROOT_URL_FLG = flags.DEFINE_boolean(
+    'bulk_data_replace_root_url',
+    secret_flag_utils.get_secret_or_env('BULK_DATA_REPLACE_ROOT_URL', False),
+    'If set to True, replaces the root url in the bulk data uri with the BULK_DATA_PROXY_URL',
+)

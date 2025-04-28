@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from concurrent import futures
 import contextlib
+import functools
 import http
 import io
 import re
@@ -36,7 +37,10 @@ from pathology.dicom_proxy import flask_util
 from pathology.dicom_proxy import logging_util
 from pathology.dicom_proxy import proxy_const
 from pathology.dicom_proxy import user_auth_util
+from pathology.dicom_proxy import bulkdata_util
+
 from pathology.shared_libs.logging_lib import cloud_logging_client
+ 
 
 
 AuthSession = user_auth_util.AuthSession
@@ -51,6 +55,10 @@ _UNSUPPORTED_PROXY_PARAMS = frozenset([
 
 _PARSE_URL = re.compile(r'(http.*)/?\?(.*)')
 
+_HEALTHCARE_API_UPLOAD_RESPONSE = re.compile(
+    r"https://healthcare\.googleapis\.com/v1beta1/projects/[^/]+/locations/[^/]+/datasets/[^/]+/dicomStores/[^/]+/dicomWeb",
+    re.IGNORECASE,
+)
 
 class DicomInstanceMetadataRetrievalError(Exception):
   pass
@@ -739,7 +747,7 @@ def _add_parameters_to_url(url: str, params_to_add: List[str]) -> str:
   return f'{url}?{params}'
 
 
-def dicom_store_proxy(params: Optional[List[str]] = None) -> flask.Response:
+def dicom_store_proxy(params: Optional[List[str]] = None, dicom_web_base_url: dicom_url_util.DicomWebBaseURL = None) -> flask.Response:
   """Processes generic DICOM Store proxy request and return results.
 
   Args:
@@ -784,6 +792,25 @@ def dicom_store_proxy(params: Optional[List[str]] = None) -> flask.Response:
     response = requests.post(
         url, headers=headers, stream=True, data=flask_util.get_data()
     )
+    # If a DICOM file is uploaded to a DICOM store, the server will return a HTML content
+    # page with the status of the upload. The content type is set to application/dicom+xml
+    # If it is valid DICOM+JSON, replace the DICOM-Store URL with the proxy URL.
+    if response.headers.get('content-type') == 'application/dicom+xml':
+      base_url = bulkdata_util.get_bulk_data_base_url(
+          dicom_web_base_url
+      )
+      new_response_text = _HEALTHCARE_API_UPLOAD_RESPONSE.sub(base_url, response.text)
+      fl_response = flask.Response(
+          new_response_text,
+          status=response.status_code,
+          direct_passthrough=False,
+      )
+      fl_response.headers.clear()
+      for key, value in response.headers.items():
+        fl_response.headers[key] = value
+      return fl_response
+
+
   elif method == flask_util.DELETE:
     response = requests.delete(url, headers=headers, stream=True)
   else:
