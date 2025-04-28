@@ -166,7 +166,7 @@ def get_bulk_data_base_url(
     tile_location_url = match.groups()[1]
     return (
         f'{base_url}{dicom_proxy_flags.PROXY_SERVER_URL_PATH_PREFIX}/'
-        f'{dicom_store_base_url.dicom_store_api_version}/{tile_location_url}'
+        f'{tile_location_url}'
     )
 
   if base_url:
