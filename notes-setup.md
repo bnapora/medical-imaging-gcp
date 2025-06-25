@@ -39,20 +39,21 @@ docker buildx build --build-arg BASE_CONTAINER=base_py_opencv_docker:latest -t u
 ```sh
 docker run -d --name dicom-proxy-gcp \
   -p 8080:8080 \
-  -e ORIGINS=* \
-  -e GOOGLE_APPLICATION_CREDENTIALS=/credentials/gcp-pathology-poc1_service_key.json \
-  -e VALIDATE_IAP=false \
-  -e JWT_AUDIENCE=/projects/1053568465268/global/backendServices/1470682154844812331 \
-  -e URL_PATH_PREFIX=/dicom_proxy \
-  -e API_PORT_FLG=8080 \
-  -e DEFAULT_DICOM_STORE_API_VERSION=v1beta1 \
-  -e ENABLE_APPLICATION_DEFAULT_CREDENTIALS=false \
-  -e ENABLE_DEBUG_FUNCTION_TIMING=false \
-  -e REDIS_CACHE_HOST_IP=localhost \
-  -e REDIS_CACHE_HOST_PORT=6379 \
-  -e GUNICORN_BIND=0.0.0.0:8080 \
-  -e ENABLE_FAKE_EMAIL=true \
-  -v $(pwd)/gcp-pathology-poc1_service_key.json:/credentials/gcp-pathology-poc1_service_key.json \
+  -e ORIGINS="*" \
+  -e GOOGLE_APPLICATION_CREDENTIALS="/credentials/gcp-pathology-poc1_service_key.json" \
+  -e VALIDATE_IAP="false" \
+  -e JWT_AUDIENCE="/projects/1053568465268/global/backendServices/1470682154844812331" \
+  -e URL_PATH_PREFIX="/public-proxy01" \
+  -e API_PORT_FLG="8080" \
+  -e DEFAULT_DICOM_STORE_API_VERSION="v1beta1" \
+  -e ENABLE_APPLICATION_DEFAULT_CREDENTIALS="true" \
+  -e ENABLE_DEBUG_FUNCTION_TIMING="true" \
+  -e REDIS_CACHE_HOST_IP="host.docker.internal" \
+  -e REDIS_CACHE_HOST_PORT="6379" \
+  -e GUNICORN_BIND="0.0.0.0:8080" \
+  -e ENABLE_FAKE_EMAIL="true" \
+  -e _DEBUG_LOGGING_USE_ABSL_LOGGING_FLG="true" \
+  -v "$(pwd)/gcp-pathology-poc1_service_key.json:/credentials/gcp-pathology-poc1_service_key.json" \
   us-west2-docker.pkg.dev/gcp-pathology-poc1/pathcloud/dicom-proxy-gcp:0.0.1
 ```
 
